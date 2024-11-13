@@ -236,3 +236,18 @@ obj-y += sensors/vl53l8/
 endif
 obj-y += input/sec_input/stm_spi/ # ADDED BY LEGO AUTOMATICALLY: DO NOT SUBMIT
 obj-y += mfd/slsi/s2mpb02/ # ADDED BY LEGO AUTOMATICALLY: DO NOT SUBMIT
+ifeq ($(CONFIG_SEC_PLATFORM_GTS9WIFI), y)
+obj-y += vibrator/common/
+obj-y += sec_panel_notifier_v2/
+obj-y += battery/charger/sm5440_charger/
+obj-y += battery/charger/sm5714_charger/
+obj-y += battery/fuelgauge/sm5714_fuelgauge/
+obj-y += mfd/sm/sm5714/
+obj-y += redriver/ps5169/
+obj-y += input/touchscreen/stm/fts1ba90a/
+obj-y += muic/sm/sm5714/
+obj-y += usb/typec/sm/sm5714/
+obj-y += input/sec_input/stm32/
+obj-y += input/wacom_tablet/
+obj-y += vibrator/dc/
+endif
