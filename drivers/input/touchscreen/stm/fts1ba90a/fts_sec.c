@@ -1284,28 +1284,29 @@ void fts_print_frame(struct fts_ts_info *info, short *min, short *max)
 	int j = 0;
 	u8 *pStr = NULL;
 	u8 pTmp[16] = { 0 };
-	int lsize = 6 * (info->SenseChannelLength + 1);
+	int lsize = 12 * (info->SenseChannelLength + 1);
+	short currentValue;
 
 	pStr = kzalloc(lsize, GFP_KERNEL);
 	if (pStr == NULL)
 		return;
 
-	snprintf(pTmp, 4, "    ");
+	snprintf(pTmp, sizeof(pTmp), "    ");
 	strlcat(pStr, pTmp, lsize);
 
 	for (i = 0; i < info->SenseChannelLength; i++) {
-		snprintf(pTmp, 6, "Rx%02d  ", i);
+		snprintf(pTmp, sizeof(pTmp), "Rx%02d  ", i);
 		strlcat(pStr, pTmp, lsize);
 	}
 
 	input_raw_info(true, &info->client->dev, "%s\n", pStr);
 
 	memset(pStr, 0x0, lsize);
-	snprintf(pTmp, 2, " +");
+	snprintf(pTmp, sizeof(pTmp), " +");
 	strlcat(pStr, pTmp, lsize);
 
 	for (i = 0; i < info->SenseChannelLength; i++) {
-		snprintf(pTmp, 6, "------");
+		snprintf(pTmp, sizeof(pTmp), "------");
 		strlcat(pStr, pTmp, lsize);
 	}
 
@@ -1313,31 +1314,31 @@ void fts_print_frame(struct fts_ts_info *info, short *min, short *max)
 
 	for (i = 0; i < info->ForceChannelLength; i++) {
 		memset(pStr, 0x0, lsize);
-		snprintf(pTmp, 7, "Tx%02d | ", i);
+		snprintf(pTmp, sizeof(pTmp), "Tx%02d | ", i);
 		strlcat(pStr, pTmp, lsize);
 
 		for (j = 0; j < info->SenseChannelLength; j++) {
-			snprintf(pTmp, 6, "%5d ", info->pFrame[(i * info->SenseChannelLength) + j]);
+			currentValue = info->pFrame[(i * info->SenseChannelLength) + j];
+			snprintf(pTmp, sizeof(pTmp), "%5d ", currentValue);
 			strlcat(pStr, pTmp, lsize);
 
-			if (i > 0) {
-				if (info->pFrame[(i * info->SenseChannelLength) + j] < *min) {
-					*min = info->pFrame[(i * info->SenseChannelLength) + j];
+				if (currentValue < *min) {
+					*min = currentValue;
 					info->rawcap_min = *min;
 					info->rawcap_min_tx = i;
 					info->rawcap_min_rx = j;
 				}
 			
-				if (info->pFrame[(i * info->SenseChannelLength) + j] > *max) {
-					*max = info->pFrame[(i * info->SenseChannelLength) + j];
+
+				if (currentValue > *max) {
+					*max = currentValue;
 					info->rawcap_max = *max;
 					info->rawcap_max_tx = i;
 					info->rawcap_max_rx = j;
 				}
 			}
+			input_raw_info(true, &info->client->dev, "%s\n", pStr);
 		}
-		input_raw_info(true, &info->client->dev, "%s\n", pStr);
-	}
 
 	input_raw_info(true, &info->client->dev, "%s, min:%d, max:%d\n", __func__, *min, *max);
 
